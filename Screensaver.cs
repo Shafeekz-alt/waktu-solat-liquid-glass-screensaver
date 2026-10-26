@@ -4,8 +4,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace WaktuSolatScreensaver
@@ -24,7 +26,7 @@ namespace WaktuSolatScreensaver
         [DllImport("user32.dll")]
         private static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
 
-        private Timer clockTimer;
+        private System.Windows.Forms.Timer clockTimer;
 
         public PreviewForm(IntPtr previewHandle)
         {
@@ -41,7 +43,7 @@ namespace WaktuSolatScreensaver
             this.Location = new Point(0, 0);
             this.Size = parentRect.Size;
 
-            clockTimer = new Timer();
+            clockTimer = new System.Windows.Forms.Timer();
             clockTimer.Interval = 1000;
             clockTimer.Tick += (s, e) => this.Invalidate();
             clockTimer.Start();
@@ -143,33 +145,141 @@ namespace WaktuSolatScreensaver
             LaunchLiquidGlassUI(mode);
         }
 
-        private static void TryRefreshJakimCache(string baseDir)
+        private static string FetchJakimJson(string zone)
         {
             try
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(
-                    "https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=WLY01");
-                req.Timeout = 2500;
-                req.ReadWriteTimeout = 2500;
+                string url = "https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=" + Uri.EscapeDataString(zone);
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+                req.Timeout = 4000;
+                req.ReadWriteTimeout = 4000;
                 req.UserAgent = "WaktuSolatLiquidGlass/1.0";
 
                 using (HttpWebResponse resp = (HttpWebResponse)req.GetResponse())
                 using (StreamReader reader = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
                 {
-                    string todayJson = reader.ReadToEnd();
-                    if (!string.IsNullOrEmpty(todayJson) && todayJson.Contains("prayerTime"))
-                    {
-                        string cachePath = Path.Combine(baseDir, "jakim-cache.js");
-                        string jsContent = "window.JAKIM_INITIAL_CACHE = { 'WLY01_today': " + todayJson + " };";
-                        File.WriteAllText(cachePath, jsContent, Encoding.UTF8);
-                    }
+                    return reader.ReadToEnd();
                 }
             }
             catch
             {
-                // Ignore network errors; existing jakim-cache.js or offline fallback will be used
+                return null;
             }
+        }
+
+        private static int StartLocalServer(string rootDir)
+        {
+            TcpListener listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((IPEndPoint)listener.LocalEndpoint).Port;
+
+            Thread serverThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        TcpClient client = listener.AcceptTcpClient();
+                        ThreadPool.QueueUserWorkItem(_ => HandleClient(client, rootDir));
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                }
+            });
+            serverThread.IsBackground = true;
+            serverThread.Start();
+            return port;
+        }
+
+        private static void HandleClient(TcpClient client, string rootDir)
+        {
+            try
+            {
+                using (client)
+                using (NetworkStream stream = client.GetStream())
+                using (StreamReader reader = new StreamReader(stream, Encoding.ASCII, false, 1024, true))
+                {
+                    string requestLine = reader.ReadLine();
+                    if (string.IsNullOrEmpty(requestLine)) return;
+
+                    string[] parts = requestLine.Split(' ');
+                    if (parts.Length < 2) return;
+
+                    string rawPath = parts[1];
+                    string pathOnly = rawPath;
+                    string query = "";
+                    int qIdx = rawPath.IndexOf('?');
+                    if (qIdx >= 0)
+                    {
+                        pathOnly = rawPath.Substring(0, qIdx);
+                        query = rawPath.Substring(qIdx + 1);
+                    }
+
+                    if (pathOnly.Equals("/api/esolat", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string zone = "WLY01";
+                        foreach (string kv in query.Split('&'))
+                        {
+                            if (kv.StartsWith("zone=", StringComparison.OrdinalIgnoreCase))
+                            {
+                                zone = Uri.UnescapeDataString(kv.Substring(5));
+                            }
+                        }
+
+                        string json = FetchJakimJson(zone);
+                        if (!string.IsNullOrEmpty(json))
+                        {
+                            byte[] body = Encoding.UTF8.GetBytes(json);
+                            WriteHttpResponse(stream, "200 OK", "application/json; charset=utf-8", body);
+                        }
+                        else
+                        {
+                            byte[] body = Encoding.UTF8.GetBytes("{\"status\":\"OFFLINE\"}");
+                            WriteHttpResponse(stream, "503 Service Unavailable", "application/json", body);
+                        }
+                        return;
+                    }
+
+                    if (pathOnly == "/") pathOnly = "/index.html";
+                    string relPath = Uri.UnescapeDataString(pathOnly.TrimStart('/')).Replace('/', Path.DirectorySeparatorChar);
+                    string fullPath = Path.GetFullPath(Path.Combine(rootDir, relPath));
+
+                    if (!fullPath.StartsWith(Path.GetFullPath(rootDir), StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
+                    {
+                        WriteHttpResponse(stream, "404 Not Found", "text/plain", Encoding.UTF8.GetBytes("Not Found"));
+                        return;
+                    }
+
+                    string ext = Path.GetExtension(fullPath).ToLowerInvariant();
+                    string contentType = "application/octet-stream";
+                    if (ext == ".html") contentType = "text/html; charset=utf-8";
+                    else if (ext == ".js") contentType = "application/javascript; charset=utf-8";
+                    else if (ext == ".css") contentType = "text/css; charset=utf-8";
+                    else if (ext == ".jpg" || ext == ".jpeg") contentType = "image/jpeg";
+                    else if (ext == ".png") contentType = "image/png";
+
+                    byte[] fileBytes = File.ReadAllBytes(fullPath);
+                    WriteHttpResponse(stream, "200 OK", contentType, fileBytes);
+                }
+            }
+            catch
+            {
+                // Ignore client disconnect errors
+            }
+        }
+
+        private static void WriteHttpResponse(NetworkStream stream, string status, string contentType, byte[] body)
+        {
+            string headers = string.Format(
+                "HTTP/1.1 {0}\r\nContent-Type: {1}\r\nContent-Length: {2}\r\nAccess-Control-Allow-Origin: *\r\nCache-Control: no-cache\r\nConnection: close\r\n\r\n",
+                status, contentType, body.Length);
+            byte[] headerBytes = Encoding.ASCII.GetBytes(headers);
+            stream.Write(headerBytes, 0, headerBytes.Length);
+            stream.Write(body, 0, body.Length);
+            stream.Flush();
         }
 
         private static void LaunchLiquidGlassUI(string mode)
@@ -177,7 +287,6 @@ namespace WaktuSolatScreensaver
             string exeDir = AppDomain.CurrentDomain.BaseDirectory;
             string htmlPath = Path.Combine(exeDir, "index.html");
 
-            // Fallback to project folder if .scr was copied to System32
             if (!File.Exists(htmlPath))
             {
                 string fallbackDir = @"C:\Users\SHAFIQ-JKMNT\.gemini\antigravity\scratch\waktu-solat-screensaver";
@@ -192,9 +301,9 @@ namespace WaktuSolatScreensaver
                 return;
             }
 
-            TryRefreshJakimCache(exeDir);
+            int port = StartLocalServer(exeDir);
+            string appUrl = string.Format("http://127.0.0.1:{0}/index.html?mode={1}", port, mode);
 
-            string fileUri = new Uri(htmlPath).AbsoluteUri + "?mode=" + mode;
             string edgePath = @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe";
             if (!File.Exists(edgePath))
             {
@@ -209,9 +318,10 @@ namespace WaktuSolatScreensaver
             {
                 ProcessStartInfo psi = new ProcessStartInfo();
                 psi.FileName = edgePath;
+                // Only clean, supported Edge flags — no warning banner at the top!
                 psi.Arguments = string.Format(
-                    "--user-data-dir=\"{0}\" --app=\"{1}\" --start-fullscreen --disable-web-security --allow-file-access-from-files --no-first-run --no-default-browser-check",
-                    profileDir, fileUri);
+                    "--user-data-dir=\"{0}\" --app=\"{1}\" --start-fullscreen --no-first-run --no-default-browser-check",
+                    profileDir, appUrl);
                 psi.UseShellExecute = false;
 
                 Process proc = Process.Start(psi);
@@ -222,7 +332,7 @@ namespace WaktuSolatScreensaver
             }
             else
             {
-                Process.Start(fileUri);
+                Process.Start(appUrl);
             }
         }
     }

@@ -1036,36 +1036,45 @@
         }
       }
 
-      // Try Live Official JAKIM e-Solat API
-      const jakimUrl = `https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=${encodeURIComponent(zoneCode)}`;
-      try {
-        const resp = await fetch(jakimUrl, { cache: "no-store" });
-        if (resp.ok) {
-          const data = await resp.json();
-          if (data && data.prayerTime && data.prayerTime.length > 0) {
-            const p = data.prayerTime[0];
-            todayPrayerData = {
-              ...p,
-              dhuha: p.dhuha || addMinutesToTimeStr(p.syuruk, 25),
-              bearing: data.bearing || "292° 31′ 16″"
-            };
-            localStorage.setItem(`jakim_cache_${zoneCode}`, JSON.stringify(todayPrayerData));
-            badge.textContent = "JAKIM LIVE";
-            renderPrayerUI();
-            return;
+      // Try Live Official JAKIM e-Solat API (via local C# proxy if available, or direct)
+      const endpoints = [];
+      if (window.location.protocol.startsWith("http")) {
+        endpoints.push(`/api/esolat?zone=${encodeURIComponent(zoneCode)}`);
+      }
+      endpoints.push(`https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=${encodeURIComponent(zoneCode)}`);
+
+      for (const url of endpoints) {
+        try {
+          const resp = await fetch(url, { cache: "no-store" });
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data && data.prayerTime && data.prayerTime.length > 0) {
+              const p = data.prayerTime[0];
+              todayPrayerData = {
+                ...p,
+                dhuha: p.dhuha || addMinutesToTimeStr(p.syuruk, 25),
+                bearing: data.bearing || "292° 31′ 16″"
+              };
+              localStorage.setItem(`jakim_cache_${zoneCode}`, JSON.stringify(todayPrayerData));
+              badge.textContent = "JAKIM LIVE";
+              renderPrayerUI();
+              return;
+            }
           }
+        } catch (err) {
+          // Try next endpoint
         }
-      } catch (err) {
-        // Fallback to localStorage cache if available
-        const saved = localStorage.getItem(`jakim_cache_${zoneCode}`);
-        if (saved) {
-          try {
-            todayPrayerData = JSON.parse(saved);
-            badge.textContent = "JAKIM CACHE";
-            renderPrayerUI();
-            return;
-          } catch (_) {}
-        }
+      }
+
+      // Fallback to localStorage cache if available
+      const saved = localStorage.getItem(`jakim_cache_${zoneCode}`);
+      if (saved) {
+        try {
+          todayPrayerData = JSON.parse(saved);
+          badge.textContent = "JAKIM CACHE";
+          renderPrayerUI();
+          return;
+        } catch (_) {}
       }
 
       if (badge.textContent === "MEMUAT...") {
