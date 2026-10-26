@@ -3,29 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Waktu Solat Malaysia — iOS Liquid Glass Screensaver</title>
+  <title>Glass TV · Waktu Solat & 50 Hadis Sahih Screensaver</title>
   <script src="jakim-cache.js"></script>
+  <script src="hadis-data.js"></script>
   <style>
     :root {
-      --glass-bg: rgba(255, 255, 255, 0.12);
-      --glass-bg-strong: rgba(255, 255, 255, 0.20);
-      --glass-bg-active: linear-gradient(135deg, rgba(120, 240, 215, 0.28) 0%, rgba(80, 175, 255, 0.22) 50%, rgba(255, 255, 255, 0.16) 100%);
-      --glass-border-light: rgba(255, 255, 255, 0.58);
-      --glass-border-dim: rgba(255, 255, 255, 0.14);
-      --glass-shadow:
-        0 26px 65px rgba(0, 0, 0, 0.42),
-        0 4px 18px rgba(0, 0, 0, 0.24),
-        inset 0 1.5px 1.5px rgba(255, 255, 255, 0.68),
-        inset 0 -1.5px 2px rgba(255, 255, 255, 0.18),
-        inset 0 0 32px rgba(255, 255, 255, 0.08);
-      --glass-blur: 28px;
-      --text-primary: rgba(255, 255, 255, 0.97);
-      --text-secondary: rgba(255, 255, 255, 0.76);
-      --text-muted: rgba(255, 255, 255, 0.55);
-      --accent-aqua: #6ef7dc;
-      --accent-blue: #66b8ff;
-      --accent-gold: #ffe08a;
-      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+      --gold: #e5c168;
+      --gold-soft: rgba(229, 193, 104, 0.72);
+      --coral-pin: #ff5e5e;
+      --text-white: #ffffff;
+      --text-high: rgba(255, 255, 255, 0.90);
+      --text-mid: rgba(255, 255, 255, 0.68);
+      --text-low: rgba(255, 255, 255, 0.50);
+      --tile-bg: rgba(18, 20, 27, 0.60);
+      --tile-border: rgba(255, 255, 255, 0.12);
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", sans-serif;
     }
 
     * {
@@ -40,9 +32,9 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #060913;
+      background: #080a10;
       font-family: var(--font-sans);
-      color: var(--text-primary);
+      color: var(--text-white);
       -webkit-font-smoothing: antialiased;
     }
 
@@ -50,853 +42,704 @@
       cursor: none !important;
     }
 
-    /* Ambient Wallpaper Stage with Dual Buffer & Ken Burns */
+    /* ==========================================================================
+       1. BACKGROUND WALLPAPER STAGE (MASJID-MASJID MALAYSIA)
+       ========================================================================== */
     .wallpaper-stage {
       position: fixed;
       inset: 0;
       z-index: 0;
       overflow: hidden;
-      background: radial-gradient(circle at 50% 30%, #162847 0%, #070d19 100%);
+      background: #090c14;
     }
 
     .wallpaper-slide {
       position: absolute;
-      inset: -4%;
+      inset: -3%;
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
       opacity: 0;
-      transform: scale(1.02);
-      transition: opacity 2.4s cubic-bezier(0.22, 1, 0.36, 1), transform 24s ease-out;
+      transform: scale(1.01);
+      filter: brightness(0.86) contrast(1.05) saturate(1.08);
+      transition: opacity 2.6s cubic-bezier(0.22, 1, 0.36, 1), transform 28s ease-out;
       will-change: opacity, transform;
     }
 
     .wallpaper-slide.active {
       opacity: 1;
-      transform: scale(1.11) translate3d(-1%, -1%, 0);
+      transform: scale(1.09) translate3d(-1%, -0.5%, 0);
     }
 
-    /* Cinematic Vignette & Ambient Refraction Orbs */
+    /* Warm Dusk Atmospheric Vignette matching the reference image */
     .wallpaper-vignette {
       position: fixed;
       inset: 0;
       z-index: 1;
       background:
-        radial-gradient(circle at 50% 42%, rgba(8, 15, 28, 0.14) 0%, rgba(5, 10, 22, 0.54) 75%, rgba(3, 6, 14, 0.78) 100%),
-        linear-gradient(180deg, rgba(4, 8, 18, 0.45) 0%, rgba(4, 8, 18, 0.08) 38%, rgba(4, 8, 18, 0.18) 65%, rgba(4, 8, 18, 0.68) 100%);
+        linear-gradient(90deg, rgba(8, 10, 16, 0.76) 0%, rgba(10, 12, 20, 0.45) 45%, rgba(8, 10, 18, 0.38) 100%),
+        linear-gradient(180deg, rgba(6, 8, 14, 0.58) 0%, rgba(8, 10, 16, 0.14) 35%, rgba(8, 10, 16, 0.25) 72%, rgba(5, 7, 12, 0.82) 100%);
       pointer-events: none;
     }
 
-    .ambient-orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(85px);
-      opacity: 0.32;
-      z-index: 1;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      animation: floatOrb 18s ease-in-out infinite alternate;
-    }
-
-    .orb-1 {
-      width: 42vw;
-      height: 42vw;
-      top: -12vw;
-      left: -8vw;
-      background: radial-gradient(circle, rgba(96, 218, 255, 0.55), transparent 70%);
-    }
-
-    .orb-2 {
-      width: 38vw;
-      height: 38vw;
-      bottom: -10vw;
-      right: -6vw;
-      background: radial-gradient(circle, rgba(110, 247, 220, 0.48), transparent 70%);
-      animation-delay: -9s;
-    }
-
-    @keyframes floatOrb {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
-      100% { transform: translate3d(4vw, 3vh, 0) scale(1.14); }
-    }
-
-    /* Core iOS 26 Liquid Glass Material */
-    .liquid-glass {
+    /* ==========================================================================
+       2. MAIN SHELL LAYOUT (MATCHING REFERENCE SCREENSHOT)
+       ========================================================================== */
+    .screen-shell {
       position: relative;
-      background: var(--glass-bg);
-      backdrop-filter: url(#liquid-refraction) blur(var(--glass-blur)) saturate(200%) brightness(1.08);
-      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(200%) brightness(1.08);
-      box-shadow: var(--glass-shadow);
-      border-radius: 32px;
-      overflow: hidden;
-      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.38s ease, background 0.38s ease;
+      z-index: 5;
+      width: 100vw;
+      height: 100vh;
+      padding: 6.2vh 6.2vw 4.2vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    /* Specular Rim Border (iOS Liquid Glass 45-deg refractive rim) */
-    .liquid-glass::before {
+    /* Top Header Row */
+    .top-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .top-kicker {
+      font-size: clamp(0.78rem, 0.95vw, 0.95rem);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+    }
+
+    .kicker-dot {
+      color: rgba(229, 193, 104, 0.65);
+    }
+
+    /* Discreet Interactive Toolbar (Top-Right) */
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.22;
+      transition: opacity 0.3s ease;
+    }
+
+    .screen-shell:hover .top-controls,
+    .top-controls:focus-within {
+      opacity: 1;
+    }
+
+    .glass-control-pill {
+      background: rgba(20, 23, 32, 0.62);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--text-high);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: var(--font-sans);
+      font-size: 0.76rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .glass-control-pill:hover {
+      background: rgba(36, 40, 56, 0.82);
+      border-color: rgba(229, 193, 104, 0.55);
+    }
+
+    .glass-control-pill option,
+    .glass-control-pill optgroup {
+      background: #12151f;
+      color: #ffffff;
+    }
+
+    .glass-control-pill.pinned {
+      border-color: rgba(229, 193, 104, 0.75);
+      color: var(--gold);
+    }
+
+    /* ==========================================================================
+       3. CENTER TWO-COLUMN STAGE (LEFT: CLOCK & WAKTU SOLAT | RIGHT: HADIS CARD)
+       ========================================================================== */
+    .center-grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      align-items: center;
+      gap: 4.5vw;
+      margin: auto 0;
+    }
+
+    /* Left Column */
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /* Giant Clock + AM/Date Stack */
+    .clock-block {
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      margin-bottom: 1.8vh;
+    }
+
+    .clock-digits {
+      font-size: clamp(4.8rem, 7.4vw, 7.6rem);
+      font-weight: 300;
+      line-height: 0.92;
+      letter-spacing: -0.035em;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
+    }
+
+    .clock-side-meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      transform: translateY(-0.5vh);
+    }
+
+    .clock-ampm {
+      font-size: clamp(1.15rem, 1.55vw, 1.5rem);
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: var(--text-high);
+    }
+
+    .clock-date-en {
+      font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+    }
+
+    /* Location & Hijri Sub-row */
+    .location-hijri-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: clamp(0.88rem, 1.02vw, 1.0rem);
+      color: var(--text-high);
+      margin-bottom: 2.3vh;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .pin-icon {
+      width: 15px;
+      height: 15px;
+      color: var(--coral-pin);
+      flex-shrink: 0;
+      transform: translateY(1px);
+    }
+
+    .moon-icon {
+      font-size: 0.92rem;
+      color: var(--gold);
+    }
+
+    .meta-sep {
+      color: var(--text-low);
+      margin: 0 2px;
+    }
+
+    /* 6 Prayer Time Tiles Row (SUBUH, SYURUK, ZOHOR, ASAR, MAGHRIB, ISYAK) */
+    .prayer-tiles-row {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(84px, 102px));
+      gap: 10px;
+      margin-bottom: 2.2vh;
+      width: 100%;
+      max-width: 665px;
+    }
+
+    .prayer-tile {
+      position: relative;
+      height: 80px;
+      border-radius: 12px;
+      background: var(--tile-bg);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--tile-border);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.35s ease;
+    }
+
+    .prayer-tile.active-next {
+      background: rgba(34, 36, 48, 0.76);
+      border-color: rgba(229, 193, 104, 0.68);
+      box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.42),
+        0 0 20px rgba(229, 193, 104, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      transform: translateY(-2px);
+    }
+
+    .prayer-tile-label {
+      font-size: 0.76rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .prayer-tile.active-next .prayer-tile-label {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .prayer-tile-time {
+      font-size: 1.16rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Status Lines Below Tiles */
+    .jakim-status-block {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .jakim-primary-status {
+      font-size: 1.02rem;
+      font-weight: 400;
+      color: var(--text-high);
+      letter-spacing: 0.01em;
+    }
+
+    .jakim-secondary-status {
+      font-size: 0.78rem;
+      color: var(--text-low);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ==========================================================================
+       4. RIGHT COLUMN: iOS LIQUID GLASS HADITH CARD (50 HADIS SAHIH)
+       ========================================================================== */
+    .hadith-glass-card {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      min-height: 315px;
+      margin-left: auto;
+      padding: 34px 38px 30px;
+      border-radius: 24px;
+      background: linear-gradient(
+        145deg,
+        rgba(32, 35, 48, 0.50) 0%,
+        rgba(17, 19, 28, 0.66) 100%
+      );
+      backdrop-filter: url(#liquid-refraction) blur(30px) saturate(175%);
+      -webkit-backdrop-filter: blur(30px) saturate(175%);
+      box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.50),
+        inset 0 1px 1px rgba(255, 255, 255, 0.34),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      transition: transform 0.35s ease;
+    }
+
+    /* Crisp Specular Liquid Glass Rim Border */
+    .hadith-glass-card::before {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      padding: 1.35px;
+      padding: 1.2px;
       background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.78) 0%,
-        rgba(255, 255, 255, 0.22) 32%,
-        rgba(255, 255, 255, 0.06) 62%,
-        rgba(140, 235, 255, 0.48) 100%
+        rgba(255, 255, 255, 0.48) 0%,
+        rgba(255, 255, 255, 0.16) 40%,
+        rgba(255, 255, 255, 0.08) 70%,
+        rgba(229, 193, 104, 0.30) 100%
       );
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
       pointer-events: none;
-      z-index: 2;
     }
 
-    /* Top Specular Sheen Reflection */
-    .liquid-glass::after {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -25%;
-      width: 150%;
-      height: 100%;
-      background: radial-gradient(
-        ellipse at 50% 0%,
-        rgba(255, 255, 255, 0.28) 0%,
-        rgba(255, 255, 255, 0.06) 45%,
-        transparent 70%
-      );
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* Main Screensaver Layout */
-    .ui-shell {
-      position: relative;
-      z-index: 5;
-      width: 100vw;
-      height: 100vh;
-      padding: 2.8vh 3.4vw 3.2vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    /* Top Bar — Dynamic Island & Controls */
-    .top-bar {
+    .hadith-top-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
-    .brand-pill {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 20px;
-      border-radius: 999px;
-    }
-
-    .live-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent-aqua);
-      box-shadow: 0 0 12px var(--accent-aqua), 0 0 24px var(--accent-aqua);
-      animation: pulseDot 2.4s infinite ease-in-out;
-      flex-shrink: 0;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.28); opacity: 0.65; }
-    }
-
-    .brand-title {
-      font-size: 0.92rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .pill-divider {
-      width: 1px;
-      height: 16px;
-      background: rgba(255, 255, 255, 0.24);
-    }
-
-    .qibla-badge {
-      font-size: 0.84rem;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Center Date Island */
-    .date-island {
-      padding: 10px 24px;
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 0.94rem;
-      font-weight: 500;
-    }
-
-    .hijri-text {
-      color: var(--accent-gold);
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    /* Right Controls Island */
-    .controls-island {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      transition: opacity 0.4s ease;
-    }
-
-    .glass-select-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .glass-select {
-      appearance: none;
-      -webkit-appearance: none;
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--text-primary);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 999px;
-      padding: 7px 32px 7px 14px;
-      font-family: var(--font-sans);
-      font-size: 0.84rem;
-      font-weight: 600;
-      cursor: pointer;
-      outline: none;
-      max-width: 270px;
-      text-overflow: ellipsis;
-      transition: background 0.25s ease, border-color 0.25s ease;
-    }
-
-    .glass-select:hover {
-      background: rgba(255, 255, 255, 0.22);
-      border-color: rgba(255, 255, 255, 0.48);
-    }
-
-    .glass-select option, .glass-select optgroup {
-      background: #0f1b2e;
-      color: #ffffff;
-    }
-
-    .select-chevron {
-      position: absolute;
-      right: 12px;
-      pointer-events: none;
-      font-size: 0.72rem;
-      color: var(--text-secondary);
-    }
-
-    .glass-btn {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--text-primary);
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      border-radius: 999px;
-      padding: 7px 13px;
-      font-family: var(--font-sans);
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.22s ease;
-    }
-
-    .glass-btn:hover {
-      background: rgba(255, 255, 255, 0.24);
-      transform: translateY(-1px);
-    }
-
-    .glass-btn.active-pin {
-      background: rgba(110, 247, 220, 0.26);
-      border-color: rgba(110, 247, 220, 0.75);
-      color: #ffffff;
-    }
-
-    /* Center Stage — iOS StandBy / Lock Screen Liquid Glass Clock & Countdown */
-    .center-stage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2.2vh;
-      margin: auto 0;
-    }
-
-    .hero-clock-card {
-      padding: 2.8vh 4.2vw 3.0vh;
-      border-radius: 46px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      min-width: min(680px, 90vw);
-    }
-
-    .zone-header-line {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.92rem;
-      font-weight: 600;
+    .hadith-collection-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-secondary);
-      margin-bottom: 0.4vh;
+      color: var(--gold);
     }
 
-    .clock-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 10px;
-      line-height: 0.96;
-      margin: 0.4vh 0 1.4vh;
-    }
-
-    .clock-hm {
-      font-size: clamp(4.8rem, 11.2vw, 9.2rem);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      font-variant-numeric: tabular-nums;
-      background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.82) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.32));
-    }
-
-    .clock-sec-col {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-    }
-
-    .clock-sec {
-      font-size: clamp(1.5rem, 2.8vw, 2.4rem);
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      color: var(--accent-aqua);
-      text-shadow: 0 0 18px rgba(110, 247, 220, 0.35);
-    }
-
-    .clock-ampm {
-      font-size: 0.88rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      padding: 3px 9px;
+    .hadith-counter-pill {
+      padding: 4px 12px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.16);
-      color: var(--text-primary);
-    }
-
-    /* Next Prayer Countdown Capsule inside Hero */
-    .next-prayer-capsule {
-      position: relative;
-      z-index: 3;
-      width: 100%;
-      max-width: 540px;
-      padding: 14px 24px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.11);
-      border: 1px solid rgba(255, 255, 255, 0.26);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .next-prayer-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .next-label-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .next-tag {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       font-size: 0.74rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(110, 247, 220, 0.35), rgba(102, 184, 255, 0.35));
-      border: 1px solid rgba(110, 247, 220, 0.65);
-      color: #ffffff;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-high);
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      transition: background 0.2s ease;
     }
 
-    .next-prayer-name {
-      font-size: 1.18rem;
+    .hadith-counter-pill:hover {
+      background: rgba(255, 255, 255, 0.20);
+    }
+
+    /* Smooth Fade Content Wrapper */
+    .hadith-body-wrap {
+      margin: auto 0;
+      padding: 6px 0 26px;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .hadith-body-wrap.fading {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .hadith-title {
+      font-size: clamp(1.55rem, 2.1vw, 2.0rem);
       font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #ffffff;
+      margin-bottom: 14px;
+      line-height: 1.22;
+    }
+
+    .hadith-text {
+      font-size: clamp(0.98rem, 1.15vw, 1.1rem);
+      font-weight: 400;
+      line-height: 1.62;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    .hadith-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .hadith-source-note {
+      font-size: 0.76rem;
+      color: var(--text-low);
       letter-spacing: 0.01em;
     }
 
-    .next-prayer-countdown {
-      font-size: 1.24rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: var(--accent-gold);
-      text-shadow: 0 2px 12px rgba(255, 224, 138, 0.35);
+    .hadith-timer-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
-    .progress-track {
-      width: 100%;
-      height: 6px;
+    .hadith-progress-bar {
+      width: 44px;
+      height: 3.5px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.16);
       overflow: hidden;
-      position: relative;
     }
 
-    .progress-fill {
+    .hadith-progress-fill {
       height: 100%;
-      width: 45%;
+      width: 100%;
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent-aqua), var(--accent-blue), var(--accent-gold));
-      box-shadow: 0 0 14px rgba(110, 247, 220, 0.7);
+      background: var(--gold);
       transition: width 1s linear;
     }
 
-    /* Bottom Area: Mosque Info Card + 8-Prayer Liquid Glass Dock */
-    .bottom-section {
-      display: flex;
-      flex-direction: column;
-      gap: 1.8vh;
+    .hadith-timer-text {
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--text-mid);
+      font-variant-numeric: tabular-nums;
     }
 
-    .mosque-meta-row {
+    /* ==========================================================================
+       5. BOTTOM DIVIDER & FOOTER BAR
+       ========================================================================== */
+    .bottom-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .footer-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .footer-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      flex-wrap: wrap;
+      font-size: 0.76rem;
+      color: var(--text-low);
     }
 
-    .mosque-caption-pill {
-      padding: 10px 20px;
-      border-radius: 22px;
-      display: inline-flex;
-      align-items: center;
-      gap: 14px;
-      max-width: min(680px, 92vw);
-    }
-
-    .mosque-icon-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-
-    .mosque-text-col {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .mosque-name {
-      font-size: 0.98rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-    }
-
-    .mosque-location {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-
-    .screensaver-hint-pill {
-      padding: 9px 18px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Prayer Dock Grid */
-    .prayer-dock {
-      padding: 14px;
-      border-radius: 34px;
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .prayer-card {
-      position: relative;
-      padding: 14px 12px;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .prayer-card.passed {
-      opacity: 0.62;
-    }
-
-    .prayer-card.current {
-      background: linear-gradient(145deg, rgba(110, 247, 220, 0.28) 0%, rgba(102, 184, 255, 0.20) 100%);
-      border-color: rgba(110, 247, 220, 0.72);
-      box-shadow:
-        0 12px 28px rgba(0, 0, 0, 0.3),
-        inset 0 1px 1.5px rgba(255, 255, 255, 0.75),
-        0 0 22px rgba(110, 247, 220, 0.22);
-      transform: translateY(-4px);
-      opacity: 1;
-    }
-
-    .prayer-card.upcoming {
-      background: linear-gradient(145deg, rgba(255, 224, 138, 0.26) 0%, rgba(255, 255, 255, 0.14) 100%);
-      border-color: rgba(255, 224, 138, 0.78);
-      box-shadow:
-        0 14px 32px rgba(0, 0, 0, 0.34),
-        inset 0 1.5px 1.5px rgba(255, 255, 255, 0.8),
-        0 0 25px rgba(255, 224, 138, 0.26);
-      transform: translateY(-6px) scale(1.02);
-      opacity: 1;
-    }
-
-    .prayer-status-pill {
-      font-size: 0.63rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
+    .footer-left {
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.18);
-      color: #fff;
-      min-height: 18px;
+      font-weight: 500;
       display: flex;
       align-items: center;
+      gap: 10px;
     }
 
-    .prayer-card.current .prayer-status-pill {
-      background: rgba(110, 247, 220, 0.35);
-      color: #eafffa;
+    .footer-right {
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.58);
     }
 
-    .prayer-card.upcoming .prayer-status-pill {
-      background: rgba(255, 224, 138, 0.38);
-      color: #fff9e6;
-    }
-
-    .prayer-icon {
-      font-size: 1.25rem;
-      margin: 2px 0;
-    }
-
-    .prayer-name {
-      font-size: 0.86rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-secondary);
-    }
-
-    .prayer-card.current .prayer-name,
-    .prayer-card.upcoming .prayer-name {
-      color: #ffffff;
-    }
-
-    .prayer-time {
-      font-size: 1.22rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.01em;
-    }
-
-    @media (max-width: 1100px) {
-      .prayer-dock {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+    @media (max-width: 1080px) {
+      .center-grid {
+        grid-template-columns: 1fr;
+        gap: 3vh;
+      }
+      .hadith-glass-card {
+        margin-left: 0;
+        max-width: 100%;
       }
     }
   </style>
 </head>
 <body>
-  <!-- SVG Filter for Authentic iOS 26 Liquid Glass Optical Refraction -->
+  <!-- Subtle Optical Liquid Glass SVG Filter -->
   <svg width="0" height="0" style="position:absolute; pointer-events:none;">
     <defs>
       <filter id="liquid-refraction" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="2" seed="7" result="noise" />
-        <feGaussianBlur in="noise" stdDeviation="2.5" result="smoothNoise" />
-        <feDisplacementMap in="SourceGraphic" in2="smoothNoise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.010 0.014" numOctaves="2" seed="5" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="3" result="smoothNoise" />
+        <feDisplacementMap in="SourceGraphic" in2="smoothNoise" scale="4" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </defs>
   </svg>
 
-  <!-- Dual-Buffered Malaysian Mosque Wallpaper Stage -->
+  <!-- Dual-Buffered Mosque Wallpaper Stage -->
   <div class="wallpaper-stage">
     <div id="slideA" class="wallpaper-slide active"></div>
     <div id="slideB" class="wallpaper-slide"></div>
   </div>
   <div class="wallpaper-vignette"></div>
-  <div class="ambient-orb orb-1"></div>
-  <div class="ambient-orb orb-2"></div>
 
-  <!-- Main iOS Liquid Glass Screensaver Shell -->
-  <main class="ui-shell">
-    <!-- Top Bar -->
-    <header class="top-bar">
-      <div class="liquid-glass brand-pill">
-        <span class="live-dot" id="liveDot"></span>
-        <div class="brand-title">
-          <span>🕌 e-Solat JAKIM</span>
-          <span id="apiSourceBadge" style="font-size:0.74rem; padding:2px 8px; border-radius:99px; background:rgba(255,255,255,0.14);">LIVE</span>
-        </div>
-        <div class="pill-divider"></div>
-        <div class="qibla-badge">
-          <span>🧭 Kiblat:</span>
-          <strong id="qiblaText">292° 31′ 16″</strong>
-        </div>
+  <!-- Main Screensaver UI -->
+  <main class="screen-shell">
+    <!-- Top Header -->
+    <header class="top-header-row">
+      <div class="top-kicker">
+        <span id="kickerCity">KUALA TERENGGANU</span>
+        <span class="kicker-dot">·</span>
+        <span>WAKTU SOLAT &amp; HADIS NAWAWI</span>
       </div>
 
-      <div class="liquid-glass date-island">
-        <span id="gregorianDate">Isnin, 26 Oktober 2026</span>
-        <div class="pill-divider"></div>
-        <span class="hijri-text" id="hijriDate">15 Jamadilawal 1448H</span>
-      </div>
-
-      <div class="liquid-glass controls-island" id="controlsIsland">
-        <div class="glass-select-wrap">
-          <select id="zoneSelect" class="glass-select" title="Pilih Zon Waktu Solat JAKIM"></select>
-          <span class="select-chevron">▼</span>
-        </div>
-        <button class="glass-btn" id="prevWallBtn" title="Masjid Sebelumnya">◀</button>
-        <button class="glass-btn" id="nextWallBtn" title="Masjid Seterusnya">▶</button>
-        <button class="glass-btn" id="formatBtn" title="Tukar Format 12j / 24j">12J</button>
-        <button class="glass-btn" id="pinModeBtn" title="Kunci Mod Interaktif (Jangan tutup bila gerakkan tetikus)">🔓 Skrin Penuh</button>
+      <!-- Discreet Controls on Hover -->
+      <div class="top-controls">
+        <select id="zoneSelect" class="glass-control-pill" title="Pilih Zon e-Solat JAKIM"></select>
+        <button id="prevHadithBtn" class="glass-control-pill" title="Hadis Sebelumnya">◀ Hadis</button>
+        <button id="nextHadithBtn" class="glass-control-pill" title="Hadis Seterusnya">Hadis ▶</button>
+        <button id="nextMosqueBtn" class="glass-control-pill" title="Tukar Wallpaper Masjid">🕌 Masjid</button>
+        <button id="pinModeBtn" class="glass-control-pill" title="Kunci Mod Interaktif (Space)">🔓 Mod Skrin</button>
       </div>
     </header>
 
-    <!-- Center Hero Clock & Countdown -->
-    <section class="center-stage">
-      <div class="liquid-glass hero-clock-card" id="heroCard">
-        <div class="zone-header-line">
-          <span>📍</span>
-          <span id="zoneTitleText">WLY01 — KUALA LUMPUR, PUTRAJAYA</span>
-        </div>
-
-        <div class="clock-row">
-          <div class="clock-hm" id="clockHM">11:50</div>
-          <div class="clock-sec-col">
-            <div class="clock-sec" id="clockSec">00</div>
-            <div class="clock-ampm" id="clockAmPm">PG</div>
+    <!-- Center 2-Column Content -->
+    <section class="center-grid">
+      <!-- Left: Clock + Location/Hijri + 6 Prayer Tiles + JAKIM Status -->
+      <div class="left-column">
+        <div class="clock-block">
+          <div class="clock-digits" id="clockHM">11:58</div>
+          <div class="clock-side-meta">
+            <div class="clock-ampm" id="clockAmPm">AM</div>
+            <div class="clock-date-en" id="clockDateEn">OCT 26, 2026</div>
           </div>
         </div>
 
-        <div class="next-prayer-capsule">
-          <div class="next-prayer-top">
-            <div class="next-label-group">
-              <span class="next-tag" id="nextBadgeLabel">SETERUSNYA</span>
-              <span class="next-prayer-name" id="nextPrayerName">Zohor • 1:00 PTG</span>
+        <div class="location-hijri-row">
+          <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span id="locationFullName">Kuala Terengganu, Terengganu</span>
+          <span class="meta-sep">·</span>
+          <span class="moon-icon">🌙</span>
+          <span id="hijriDateText">15 Jamadilawal 1448H</span>
+        </div>
+
+        <div class="prayer-tiles-row" id="prayerTilesRow">
+          <div class="prayer-tile" data-key="fajr">
+            <span class="prayer-tile-label">SUBUH</span>
+            <span class="prayer-tile-time" id="time-fajr">05:42</span>
+          </div>
+          <div class="prayer-tile" data-key="syuruk">
+            <span class="prayer-tile-label">SYURUK</span>
+            <span class="prayer-tile-time" id="time-syuruk">06:50</span>
+          </div>
+          <div class="prayer-tile" data-key="dhuhr">
+            <span class="prayer-tile-label">ZOHOR</span>
+            <span class="prayer-tile-time" id="time-dhuhr">12:54</span>
+          </div>
+          <div class="prayer-tile" data-key="asr">
+            <span class="prayer-tile-label">ASAR</span>
+            <span class="prayer-tile-time" id="time-asr">16:13</span>
+          </div>
+          <div class="prayer-tile" data-key="maghrib">
+            <span class="prayer-tile-label">MAGHRIB</span>
+            <span class="prayer-tile-time" id="time-maghrib">18:53</span>
+          </div>
+          <div class="prayer-tile" data-key="isha">
+            <span class="prayer-tile-label">ISYAK</span>
+            <span class="prayer-tile-time" id="time-isha">20:03</span>
+          </div>
+        </div>
+
+        <div class="jakim-status-block">
+          <div class="jakim-primary-status" id="nextPrayerSummary">Seterusnya: Zohor pada 12:54 PM ·</div>
+          <div class="jakim-secondary-status">
+            <span id="jakimZoneCodeText">e-Solat JAKIM - TRG01</span>
+            <span>|</span>
+            <span id="jakimSyncStatusText">Disambungkan ke e-Solat JAKIM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Liquid Glass Hadith Card (50 Hadis Sahih) -->
+      <div class="hadith-glass-card" id="hadithCard">
+        <div class="hadith-top-row">
+          <div class="hadith-collection-label" id="hadithCollection">HADIS 40 IMAM NAWAWI</div>
+          <div class="hadith-counter-pill" id="hadithCounter" title="Klik untuk Hadis seterusnya">01 / 50</div>
+        </div>
+
+        <div class="hadith-body-wrap" id="hadithBodyWrap">
+          <h2 class="hadith-title" id="hadithTitle">Keutamaan Niat</h2>
+          <p class="hadith-text" id="hadithText">
+            Nilai sesuatu amalan bergantung pada niat, dan setiap orang hanya memperoleh apa yang diniatkannya. Lakukan setiap kebaikan dengan ikhlas semata-mata kerana Allah.
+          </p>
+        </div>
+
+        <div class="hadith-bottom-row">
+          <div class="hadith-source-note" id="hadithSource">Ringkasan pengajaran · bukan matan penuh</div>
+          <div class="hadith-timer-group">
+            <div class="hadith-progress-bar">
+              <div class="hadith-progress-fill" id="hadithProgressFill" style="width: 100%;"></div>
             </div>
-            <div class="next-prayer-countdown" id="nextPrayerCountdown">-01:09:42</div>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="prayerProgressFill" style="width: 50%;"></div>
+            <span class="hadith-timer-text" id="hadithTimerText">00:20</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Bottom Mosque Caption + 8-Waktu Liquid Glass Dock -->
-    <footer class="bottom-section">
-      <div class="mosque-meta-row">
-        <div class="liquid-glass mosque-caption-pill">
-          <div class="mosque-icon-badge">🕌</div>
-          <div class="mosque-text-col">
-            <div class="mosque-name" id="mosqueName">Masjid Putra</div>
-            <div class="mosque-location" id="mosqueLocation">Putrajaya, Wilayah Persekutuan • Seni Bina Islam-Melayu Moden di Tasik Putrajaya</div>
-          </div>
+    <!-- Bottom Divider & Footer -->
+    <footer class="bottom-footer">
+      <div class="footer-divider"></div>
+      <div class="footer-row">
+        <div class="footer-left">
+          <span>GLASS TV</span>
+          <span>·</span>
+          <span>ISLAMIC SCREENSAVER</span>
+          <span>·</span>
+          <span id="footerMosqueName" style="color: rgba(229, 193, 104, 0.72);">MASJID PUTRA, PUTRAJAYA</span>
         </div>
-
-        <div class="liquid-glass screensaver-hint-pill" id="screensaverHint">
-          <span id="hintText">Tekan [Space] untuk Kunci Mod Interaktif • Tekan [Esc] untuk Keluar</span>
+        <div class="footer-right" id="footerHintText">
+          Gerakkan tetikus atau tekan kekunci untuk keluar
         </div>
-      </div>
-
-      <div class="liquid-glass prayer-dock" id="prayerDock">
-        <!-- Populated dynamically by JS -->
       </div>
     </footer>
   </main>
 
   <script>
     // ============================================================================
-    // 1. SENARAI PENUH ZON E-SOLAT JAKIM MENGIKUT NEGERI
+    // 1. SENARAI ZON E-SOLAT JAKIM
     // ============================================================================
     const JAKIM_ZONES = [
-      { group: "Wilayah Persekutuan", code: "WLY01", name: "Kuala Lumpur, Putrajaya", offsetMin: 0 },
-      { group: "Wilayah Persekutuan", code: "WLY02", name: "Labuan", offsetMin: -54 },
-      { group: "Selangor", code: "SGR01", name: "Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam", offsetMin: 0 },
-      { group: "Selangor", code: "SGR02", name: "Kuala Selangor, Sabak Bernam", offsetMin: 2 },
-      { group: "Selangor", code: "SGR03", name: "Klang, Kuala Langat", offsetMin: 1 },
-      { group: "Johor", code: "JHR01", name: "Pulau Aur dan Pulau Pemanggil", offsetMin: -11 },
-      { group: "Johor", code: "JHR02", name: "Johor Bahru, Kota Tinggi, Mersing, Kulai", offsetMin: -8 },
-      { group: "Johor", code: "JHR03", name: "Kluang, Pontian", offsetMin: -6 },
-      { group: "Johor", code: "JHR04", name: "Batu Pahat, Muar, Segamat, Gemas Johor, Tangkak", offsetMin: -4 },
-      { group: "Pulau Pinang", code: "PNG01", name: "Seluruh Negeri Pulau Pinang", offsetMin: 6 },
-      { group: "Perak", code: "PRK01", name: "Tapah, Slim River, Tanjung Malim", offsetMin: 2 },
-      { group: "Perak", code: "PRK02", name: "Kuala Kangsar, Sg. Siput, Ipoh, Batu Gajah, Kampar", offsetMin: 4 },
-      { group: "Perak", code: "PRK03", name: "Lenggong, Pengkalan Hulu, Grik", offsetMin: 3 },
-      { group: "Perak", code: "PRK04", name: "Temengor, Belum", offsetMin: 2 },
-      { group: "Perak", code: "PRK05", name: "Kg Gajah, Teluk Intan, Bagan Datuk, Seri Iskandar, Beruas, Parit, Lumut, Sitiawan, Pulau Pangkor", offsetMin: 5 },
-      { group: "Perak", code: "PRK06", name: "Selama, Taiping, Bagan Serai, Parit Buntar", offsetMin: 5 },
-      { group: "Perak", code: "PRK07", name: "Bukit Larut", offsetMin: 5 },
-      { group: "Kedah", code: "KDH01", name: "Kota Setar, Kubang Pasu, Pokok Sena", offsetMin: 6 },
-      { group: "Kedah", code: "KDH02", name: "Kuala Muda, Yan, Pendang", offsetMin: 6 },
-      { group: "Kedah", code: "KDH03", name: "Padang Terap, Sik", offsetMin: 4 },
-      { group: "Kedah", code: "KDH04", name: "Baling", offsetMin: 4 },
-      { group: "Kedah", code: "KDH05", name: "Bandar Baharu, Kulim", offsetMin: 5 },
-      { group: "Kedah", code: "KDH06", name: "Langkawi", offsetMin: 9 },
-      { group: "Kedah", code: "KDH07", name: "Puncak Gunung Jerai", offsetMin: 6 },
-      { group: "Negeri Sembilan", code: "NGS01", name: "Tampin, Jempol", offsetMin: -2 },
-      { group: "Negeri Sembilan", code: "NGS02", name: "Jelebu, Kuala Pilah, Rembau", offsetMin: -1 },
-      { group: "Negeri Sembilan", code: "NGS03", name: "Port Dickson, Seremban", offsetMin: 0 },
-      { group: "Melaka", code: "MLK01", name: "Seluruh Negeri Melaka", offsetMin: -2 },
-      { group: "Pahang", code: "PHG01", name: "Pulau Tioman", offsetMin: -10 },
-      { group: "Pahang", code: "PHG02", name: "Kuantan, Pekan, Rompin, Muadzam Shah", offsetMin: -6 },
-      { group: "Pahang", code: "PHG03", name: "Jerantut, Temerloh, Maran, Bera, Chenor, Jengka", offsetMin: -3 },
-      { group: "Pahang", code: "PHG04", name: "Bentong, Lipis, Raub", offsetMin: -1 },
-      { group: "Pahang", code: "PHG05", name: "Genting Sempah, Janda Baik, Bukit Tinggi", offsetMin: 0 },
-      { group: "Pahang", code: "PHG06", name: "Cameron Highlands, Genting Higlands, Bukit Fraser", offsetMin: 1 },
-      { group: "Terengganu", code: "TRG01", name: "Kuala Terengganu, Marang, Kuala Nerus", offsetMin: -6 },
-      { group: "Terengganu", code: "TRG02", name: "Besut, Setiu", offsetMin: -4 },
-      { group: "Terengganu", code: "TRG03", name: "Hulu Terengganu", offsetMin: -5 },
-      { group: "Terengganu", code: "TRG04", name: "Dungun, Kemaman", offsetMin: -6 },
-      { group: "Kelantan", code: "KTN01", name: "Bachok, Kota Bharu, Machang, Pasir Mas, Pasir Puteh, Tanah Merah, Tumpat, Kuala Krai", offsetMin: -2 },
-      { group: "Kelantan", code: "KTN02", name: "Gua Musang, Jeli, Jajahan Kecil Lojing", offsetMin: 0 },
-      { group: "Perlis", code: "PLS01", name: "Seluruh Negeri Perlis", offsetMin: 7 },
-      { group: "Sabah", code: "SBH07", name: "Kota Kinabalu, Ranau, Kota Belud, Tuaran, Penampang, Papar, Putatan", offsetMin: -58 },
-      { group: "Sabah", code: "SBH01", name: "Bahagian Sandakan (Timur), Bukit Garam, Semawang, Temanggong, Tambisan", offsetMin: -67 },
-      { group: "Sabah", code: "SBH04", name: "Bandar Tawau, Balong, Merotai, Kalabakan", offsetMin: -65 },
-      { group: "Sarawak", code: "SWK08", name: "Kuching, Bau, Lundu, Sematan", offsetMin: -34 },
-      { group: "Sarawak", code: "SWK01", name: "Limbang, Lawas, Sundar, Trusan", offsetMin: -53 },
-      { group: "Sarawak", code: "SWK02", name: "Miri, Niah, Bekenu, Sibuti, Marudi", offsetMin: -49 },
-      { group: "Sarawak", code: "SWK04", name: "Sibu, Mukah, Dalat, Song, Igan, Oya, Balingian, Kanowit, Kapit", offsetMin: -41 }
+      { group: "Terengganu", code: "TRG01", city: "Kuala Terengganu", displayLocation: "Kuala Terengganu, Terengganu", offsetMin: -6 },
+      { group: "Terengganu", code: "TRG02", city: "Besut & Setiu", displayLocation: "Besut, Setiu, Terengganu", offsetMin: -4 },
+      { group: "Terengganu", code: "TRG03", city: "Hulu Terengganu", displayLocation: "Hulu Terengganu, Terengganu", offsetMin: -5 },
+      { group: "Terengganu", code: "TRG04", city: "Dungun & Kemaman", displayLocation: "Dungun, Kemaman, Terengganu", offsetMin: -6 },
+      { group: "Wilayah Persekutuan", code: "WLY01", city: "Kuala Lumpur", displayLocation: "Kuala Lumpur, Putrajaya", offsetMin: 0 },
+      { group: "Wilayah Persekutuan", code: "WLY02", city: "Labuan", displayLocation: "Wilayah Persekutuan Labuan", offsetMin: -54 },
+      { group: "Selangor", code: "SGR01", city: "Shah Alam & Petaling", displayLocation: "Shah Alam, Petaling, Gombak, Sepang, Selangor", offsetMin: 0 },
+      { group: "Selangor", code: "SGR02", city: "Kuala Selangor", displayLocation: "Kuala Selangor, Sabak Bernam, Selangor", offsetMin: 2 },
+      { group: "Selangor", code: "SGR03", city: "Klang & Kuala Langat", displayLocation: "Klang, Kuala Langat, Selangor", offsetMin: 1 },
+      { group: "Johor", code: "JHR01", city: "Pulau Aur", displayLocation: "Pulau Aur dan Pulau Pemanggil, Johor", offsetMin: -11 },
+      { group: "Johor", code: "JHR02", city: "Johor Bahru", displayLocation: "Johor Bahru, Kota Tinggi, Mersing, Kulai", offsetMin: -8 },
+      { group: "Johor", code: "JHR03", city: "Kluang & Pontian", displayLocation: "Kluang, Pontian, Johor", offsetMin: -6 },
+      { group: "Johor", code: "JHR04", city: "Batu Pahat & Muar", displayLocation: "Batu Pahat, Muar, Segamat, Tangkak, Johor", offsetMin: -4 },
+      { group: "Pulau Pinang", code: "PNG01", city: "George Town", displayLocation: "Seluruh Negeri Pulau Pinang", offsetMin: 6 },
+      { group: "Perak", code: "PRK01", city: "Tapah & Tg Malim", displayLocation: "Tapah, Slim River, Tanjung Malim, Perak", offsetMin: 2 },
+      { group: "Perak", code: "PRK02", city: "Ipoh & Kuala Kangsar", displayLocation: "Ipoh, Kuala Kangsar, Batu Gajah, Perak", offsetMin: 4 },
+      { group: "Perak", code: "PRK05", city: "Teluk Intan & Manjung", displayLocation: "Teluk Intan, Seri Iskandar, Lumut, Perak", offsetMin: 5 },
+      { group: "Perak", code: "PRK06", city: "Taiping", displayLocation: "Taiping, Selama, Bagan Serai, Perak", offsetMin: 5 },
+      { group: "Kedah", code: "KDH01", city: "Alor Setar", displayLocation: "Kota Setar, Kubang Pasu, Kedah", offsetMin: 6 },
+      { group: "Kedah", code: "KDH02", city: "Sungai Petani", displayLocation: "Kuala Muda, Yan, Pendang, Kedah", offsetMin: 6 },
+      { group: "Kedah", code: "KDH05", city: "Kulim", displayLocation: "Kulim, Bandar Baharu, Kedah", offsetMin: 5 },
+      { group: "Kedah", code: "KDH06", city: "Langkawi", displayLocation: "Pulau Langkawi, Kedah", offsetMin: 9 },
+      { group: "Kelantan", code: "KTN01", city: "Kota Bharu", displayLocation: "Kota Bharu, Bachok, Pasir Mas, Kelantan", offsetMin: -2 },
+      { group: "Kelantan", code: "KTN02", city: "Gua Musang & Jeli", displayLocation: "Gua Musang, Jeli, Lojing, Kelantan", offsetMin: 0 },
+      { group: "Pahang", code: "PHG02", city: "Kuantan & Pekan", displayLocation: "Kuantan, Pekan, Rompin, Pahang", offsetMin: -6 },
+      { group: "Pahang", code: "PHG03", city: "Temerloh & Jerantut", displayLocation: "Temerloh, Jerantut, Maran, Bera, Pahang", offsetMin: -3 },
+      { group: "Pahang", code: "PHG04", city: "Bentong & Raub", displayLocation: "Bentong, Lipis, Raub, Pahang", offsetMin: -1 },
+      { group: "Negeri Sembilan", code: "NGS03", city: "Seremban & PD", displayLocation: "Seremban, Port Dickson, Negeri Sembilan", offsetMin: 0 },
+      { group: "Melaka", code: "MLK01", city: "Bandaraya Melaka", displayLocation: "Seluruh Negeri Melaka", offsetMin: -2 },
+      { group: "Perlis", code: "PLS01", city: "Kangar", displayLocation: "Seluruh Negeri Perlis", offsetMin: 7 },
+      { group: "Sabah", code: "SBH07", city: "Kota Kinabalu", displayLocation: "Kota Kinabalu, Penampang, Putatan, Sabah", offsetMin: -58 },
+      { group: "Sabah", code: "SBH01", city: "Sandakan", displayLocation: "Sandakan, Sabah", offsetMin: -67 },
+      { group: "Sabah", code: "SBH04", city: "Tawau", displayLocation: "Tawau, Sabah", offsetMin: -65 },
+      { group: "Sarawak", code: "SWK08", city: "Kuching", displayLocation: "Kuching, Bau, Lundu, Sarawak", offsetMin: -34 },
+      { group: "Sarawak", code: "SWK02", city: "Miri", displayLocation: "Miri, Sarawak", offsetMin: -49 },
+      { group: "Sarawak", code: "SWK04", city: "Sibu & Mukah", displayLocation: "Sibu, Mukah, Sarawak", offsetMin: -41 }
     ];
 
     // ============================================================================
-    // 2. KOLEKSI WALLPAPER MASJID-MASJID IKONIK MALAYSIA
+    // 2. KOLEKSI WALLPAPER MASJID MALAYSIA
     // ============================================================================
     const MALAYSIA_MOSQUES = [
-      {
-        id: "masjid-putra",
-        name: "Masjid Putra (Putra Mosque)",
-        location: "Putrajaya, Wilayah Persekutuan • Kubah Merah Jambu di Pinggir Tasik Putrajaya",
-        localUrl: "wallpapers/masjid-putra.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Putra_Mosque_at_sunset.jpg/1920px-Putra_Mosque_at_sunset.jpg",
-        fallbackGradient: "radial-gradient(circle at 70% 30%, #6b2d5c 0%, #2a1b4e 45%, #090d1a 100%)"
-      },
-      {
-        id: "masjid-selat-melaka",
-        name: "Masjid Selat Melaka (Malacca Straits Mosque)",
-        location: "Pulau Melaka, Melaka • Masjid Terapung di Pesisir Selat Melaka",
-        localUrl: "wallpapers/masjid-selat-melaka.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Malacca_Straits_Mosque_at_sunset.jpg/1920px-Malacca_Straits_Mosque_at_sunset.jpg",
-        fallbackGradient: "radial-gradient(circle at 30% 25%, #7a3e2e 0%, #1d3557 55%, #070b14 100%)"
-      },
-      {
-        id: "masjid-kristal",
-        name: "Masjid Kristal (Crystal Mosque)",
-        location: "Pulau Wan Man, Kuala Terengganu • Binaan Kaca & Keluli Berkilau di Sungai Terengganu",
-        localUrl: "wallpapers/masjid-kristal.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Crystal_Mosque%2C_Kuala_Terengganu.jpg/1920px-Crystal_Mosque%2C_Kuala_Terengganu.jpg",
-        fallbackGradient: "radial-gradient(circle at 60% 25%, #1d4e68 0%, #132743 55%, #060a12 100%)"
-      },
-      {
-        id: "masjid-wilayah",
-        name: "Masjid Wilayah Persekutuan",
-        location: "Kuala Lumpur • Gabungan Seni Bina Uthmaniyyah & Tradisional Melayu",
-        localUrl: "wallpapers/masjid-wilayah.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Kuala_Lumpur_Malaysia_Federal-Territory-Mosque-01.jpg/1920px-Kuala_Lumpur_Malaysia_Federal-Territory-Mosque-01.jpg",
-        fallbackGradient: "radial-gradient(circle at 40% 30%, #1b526b 0%, #162642 55%, #070b14 100%)"
-      },
-      {
-        id: "masjid-shah-alam",
-        name: "Masjid Sultan Salahuddin Abdul Aziz Shah (Masjid Biru)",
-        location: "Shah Alam, Selangor • Masjid Terbesar di Malaysia dengan Kubah Biru & Perak",
-        localUrl: "wallpapers/masjid-shah-alam.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Inside_sultan_salahuddin_mosque.JPG",
-        fallbackGradient: "radial-gradient(circle at 50% 25%, #1a4b84 0%, #0f2547 55%, #050912 100%)"
-      },
-      {
-        id: "masjid-ubudiah",
-        name: "Masjid Ubudiah Diraja",
-        location: "Bukit Chandan, Kuala Kangsar, Perak • Kubah Emas & Marmar Bersejarah (1917)",
-        localUrl: "wallpapers/masjid-ubudiah.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Masjid_Ubudiah%2C_Kuala_Kangsar.JPG/1920px-Masjid_Ubudiah%2C_Kuala_Kangsar.JPG",
-        fallbackGradient: "radial-gradient(circle at 65% 30%, #6e5524 0%, #1c2c44 55%, #070b14 100%)"
-      },
-      {
-        id: "masjid-kk",
-        name: "Masjid Bandaraya Kota Kinabalu",
-        location: "Teluk Likas, Kota Kinabalu, Sabah • Masjid Terapung Berlatarkan Lagun Biru",
-        localUrl: "wallpapers/masjid-kk.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Kota_Kinabalu_Sabah_City-Mosque-01.jpg/1920px-Kota_Kinabalu_Sabah_City-Mosque-01.jpg",
-        fallbackGradient: "radial-gradient(circle at 35% 30%, #185a6e 0%, #122947 55%, #060a13 100%)"
-      },
-      {
-        id: "masjid-negara",
-        name: "Masjid Negara Malaysia",
-        location: "Kuala Lumpur • Kubah Payung Bintang 16 Bucu & Menara 73 Meter",
-        localUrl: "wallpapers/masjid-negara.jpg",
-        remoteUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/National_Mosque_of_Malaysia_2023.jpg/1920px-National_Mosque_of_Malaysia_2023.jpg",
-        fallbackGradient: "radial-gradient(circle at 50% 35%, #155c5b 0%, #122840 55%, #060911 100%)"
-      }
-    ];
-
-    const PRAYER_KEYS = [
-      { key: "imsak", label: "Imsak", icon: "🌌" },
-      { key: "fajr", label: "Subuh", icon: "🌅" },
-      { key: "syuruk", label: "Syuruk", icon: "🌄" },
-      { key: "dhuha", label: "Dhuha", icon: "☀️" },
-      { key: "dhuhr", label: "Zohor", icon: "🌤️" },
-      { key: "asr", label: "Asar", icon: "⛅" },
-      { key: "maghrib", label: "Maghrib", icon: "🌇" },
-      { key: "isha", label: "Isyak", icon: "🌙" }
+      { name: "MASJID SELAT MELAKA, MELAKA", url: "wallpapers/masjid-selat-melaka.jpg" },
+      { name: "MASJID KRISTAL, KUALA TERENGGANU", url: "wallpapers/masjid-kristal.jpg" },
+      { name: "MASJID WILAYAH PERSEKUTUAN, KUALA LUMPUR", url: "wallpapers/masjid-wilayah.jpg" },
+      { name: "MASJID PUTRA, PUTRAJAYA", url: "wallpapers/masjid-putra.jpg" },
+      { name: "MASJID BANDARAYA KOTA KINABALU, SABAH", url: "wallpapers/masjid-kk.jpg" },
+      { name: "MASJID UBUDIAH DIRAJA, KUALA KANGSAR", url: "wallpapers/masjid-ubudiah.jpg" },
+      { name: "MASJID NEGARA MALAYSIA, KUALA LUMPUR", url: "wallpapers/masjid-negara.jpg" },
+      { name: "MASJID SULTAN SALAHUDDIN ABDUL AZIZ SHAH, SHAH ALAM", url: "wallpapers/masjid-shah-alam.jpg" }
     ];
 
     const HIJRI_MONTHS_MS = [
@@ -905,138 +748,131 @@
       "Ramadan", "Syawal", "Zulkaedah", "Zulhijjah"
     ];
 
+    const SIX_PRAYERS = [
+      { key: "fajr", label: "Subuh" },
+      { key: "syuruk", label: "Syuruk" },
+      { key: "dhuhr", label: "Zohor" },
+      { key: "asr", label: "Asar" },
+      { key: "maghrib", label: "Maghrib" },
+      { key: "isha", label: "Isyak" }
+    ];
+
+    const BASELINE_WLY01 = {
+      hijri: "1448-05-15",
+      fajr: "05:48:00",
+      syuruk: "06:56:00",
+      dhuhr: "13:00:00",
+      asr: "16:19:00",
+      maghrib: "18:59:00",
+      isha: "20:09:00"
+    };
+
     // ============================================================================
-    // 3. STATE & TETAPAN
+    // 3. STATE APLIKASI
     // ============================================================================
     const urlParams = new URLSearchParams(window.location.search);
     const launchMode = urlParams.get("mode") || "interactive";
     let isScreensaverExitArmed = (launchMode === "screensaver");
     let isPinnedInteractive = (launchMode !== "screensaver");
-    let currentZoneCode = localStorage.getItem("waktu_solat_zone") || "WLY01";
-    let use24Hour = localStorage.getItem("waktu_solat_24h") === "true";
-    let currentMosqueIndex = 0;
+
+    let currentZoneCode = localStorage.getItem("waktu_solat_zone") || "TRG01";
+    let currentMosqueIdx = 0;
     let activeSlideId = "slideA";
     let todayPrayerData = null;
 
-    // Baseline WLY01 prayer times (in case of full offline mode)
-    const BASELINE_WLY01 = {
-      hijri: "1448-05-15",
-      date: "26-Okt-2026",
-      day: "Monday",
-      imsak: "05:38:00",
-      fajr: "05:48:00",
-      syuruk: "06:56:00",
-      dhuha: "07:21:00",
-      dhuhr: "13:00:00",
-      asr: "16:19:00",
-      maghrib: "18:59:00",
-      isha: "20:09:00",
-      bearing: "292° 31′ 16″"
-    };
+    // Hadith Rotation State (50 Hadis Sahih, 20 saat setiap satu, berulang tanpa henti)
+    const HADITH_LIST = window.HADIS_SAHIH_50 || [];
+    const HADITH_DURATION_SEC = 20;
+    let currentHadithIdx = 0;
+    let hadithRemainingSec = HADITH_DURATION_SEC;
 
     // ============================================================================
-    // 4. INISIALISASI DROPDOWN ZON JAKIM
+    // 4. DROPDOWN ZON JAKIM & LOKASI
     // ============================================================================
-    function initZoneDropdown() {
-      const select = document.getElementById("zoneSelect");
-      select.innerHTML = "";
+    function getZoneInfo(code) {
+      return JAKIM_ZONES.find(z => z.code === code) || JAKIM_ZONES[0];
+    }
+
+    function initZoneSelect() {
+      const sel = document.getElementById("zoneSelect");
+      sel.innerHTML = "";
       const groups = {};
       JAKIM_ZONES.forEach(z => {
         if (!groups[z.group]) groups[z.group] = [];
         groups[z.group].push(z);
       });
 
-      Object.keys(groups).forEach(groupName => {
-        const optgroup = document.createElement("optgroup");
-        optgroup.label = groupName;
-        groups[groupName].forEach(z => {
+      Object.keys(groups).forEach(gName => {
+        const og = document.createElement("optgroup");
+        og.label = gName;
+        groups[gName].forEach(z => {
           const opt = document.createElement("option");
           opt.value = z.code;
-          opt.textContent = `${z.code} — ${z.name}`;
+          opt.textContent = `${z.code} — ${z.city}`;
           if (z.code === currentZoneCode) opt.selected = true;
-          optgroup.appendChild(opt);
+          og.appendChild(opt);
         });
-        select.appendChild(optgroup);
+        sel.appendChild(og);
       });
 
-      select.addEventListener("change", (e) => {
+      sel.addEventListener("change", (e) => {
         currentZoneCode = e.target.value;
         localStorage.setItem("waktu_solat_zone", currentZoneCode);
-        updateZoneTitle();
-        loadPrayerTimesForZone(currentZoneCode);
+        updateLocationLabels();
+        loadPrayerTimes(currentZoneCode);
       });
-      updateZoneTitle();
+
+      updateLocationLabels();
     }
 
-    function getZoneInfo(code) {
-      return JAKIM_ZONES.find(z => z.code === code) || JAKIM_ZONES[0];
-    }
-
-    function updateZoneTitle() {
+    function updateLocationLabels() {
       const z = getZoneInfo(currentZoneCode);
-      document.getElementById("zoneTitleText").textContent = `${z.code} — ${z.name.toUpperCase()}`;
+      document.getElementById("kickerCity").textContent = z.city.toUpperCase();
+      document.getElementById("locationFullName").textContent = z.displayLocation;
+      document.getElementById("jakimZoneCodeText").textContent = `e-Solat JAKIM - ${z.code}`;
     }
 
     // ============================================================================
-    // 5. PENGAMBILAN DATA WAKTU SOLAT E-SOLAT JAKIM (LIVE + CACHE + FALLBACK)
+    // 5. DATA WAKTU SOLAT E-SOLAT JAKIM
     // ============================================================================
-    function addMinutesToTimeStr(timeStr, offsetMinutes) {
-      const parts = timeStr.split(":").map(Number);
-      let totalMinutes = parts[0] * 60 + parts[1] + offsetMinutes;
-      totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
-      const hh = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
-      const mm = String(totalMinutes % 60).padStart(2, "0");
+    function addMinutes(timeStr, offsetMinutes) {
+      const parts = (timeStr || "00:00:00").split(":").map(Number);
+      let mins = parts[0] * 60 + parts[1] + offsetMinutes;
+      mins = ((mins % 1440) + 1440) % 1440;
+      const hh = String(Math.floor(mins / 60)).padStart(2, "0");
+      const mm = String(mins % 60).padStart(2, "0");
       return `${hh}:${mm}:00`;
     }
 
     function computeFallbackForZone(zoneCode) {
       let base = BASELINE_WLY01;
-      if (window.JAKIM_INITIAL_CACHE && window.JAKIM_INITIAL_CACHE.WLY01_today &&
+      if (window.JAKIM_INITIAL_CACHE &&
+          window.JAKIM_INITIAL_CACHE.WLY01_today &&
           window.JAKIM_INITIAL_CACHE.WLY01_today.prayerTime &&
           window.JAKIM_INITIAL_CACHE.WLY01_today.prayerTime.length > 0) {
-        base = {
-          ...window.JAKIM_INITIAL_CACHE.WLY01_today.prayerTime[0],
-          bearing: window.JAKIM_INITIAL_CACHE.WLY01_today.bearing || BASELINE_WLY01.bearing
-        };
+        base = window.JAKIM_INITIAL_CACHE.WLY01_today.prayerTime[0];
       }
       const z = getZoneInfo(zoneCode);
       const off = z.offsetMin || 0;
       return {
-        hijri: base.hijri,
-        imsak: addMinutesToTimeStr(base.imsak, off),
-        fajr: addMinutesToTimeStr(base.fajr, off),
-        syuruk: addMinutesToTimeStr(base.syuruk, off),
-        dhuha: addMinutesToTimeStr(base.dhuha || addMinutesToTimeStr(base.syuruk, 25), off),
-        dhuhr: addMinutesToTimeStr(base.dhuhr, off),
-        asr: addMinutesToTimeStr(base.asr, off),
-        maghrib: addMinutesToTimeStr(base.maghrib, off),
-        isha: addMinutesToTimeStr(base.isha, off),
-        bearing: base.bearing || "292° 31′ 16″"
+        hijri: base.hijri || BASELINE_WLY01.hijri,
+        fajr: addMinutes(base.fajr, off),
+        syuruk: addMinutes(base.syuruk, off),
+        dhuhr: addMinutes(base.dhuhr, off),
+        asr: addMinutes(base.asr, off),
+        maghrib: addMinutes(base.maghrib, off),
+        isha: addMinutes(base.isha, off)
       };
     }
 
-    async function loadPrayerTimesForZone(zoneCode) {
-      const badge = document.getElementById("apiSourceBadge");
-      badge.textContent = "MEMUAT...";
+    async function loadPrayerTimes(zoneCode) {
+      const syncEl = document.getElementById("jakimSyncStatusText");
+      syncEl.textContent = "Menyemak JAKIM...";
 
-      // Show immediate data from cache/fallback first so UI never flickers
+      // Papar waktu serta-merta supaya tidak pernah kosong (--:--)
       todayPrayerData = computeFallbackForZone(zoneCode);
-      renderPrayerUI();
+      renderPrayerTimes();
 
-      // If WLY01 is requested and pre-bundled JAKIM cache matches today, mark LIVE
-      if (zoneCode === "WLY01" && window.JAKIM_INITIAL_CACHE && window.JAKIM_INITIAL_CACHE.WLY01_today) {
-        const cached = window.JAKIM_INITIAL_CACHE.WLY01_today;
-        if (cached.prayerTime && cached.prayerTime.length > 0) {
-          todayPrayerData = {
-            ...cached.prayerTime[0],
-            bearing: cached.bearing || "292° 31′ 16″"
-          };
-          badge.textContent = "JAKIM LIVE";
-          renderPrayerUI();
-        }
-      }
-
-      // Try Live Official JAKIM e-Solat API (via local C# proxy if available, or direct)
       const endpoints = [];
       if (window.location.protocol.startsWith("http")) {
         endpoints.push(`/api/esolat?zone=${encodeURIComponent(zoneCode)}`);
@@ -1049,334 +885,276 @@
           if (resp.ok) {
             const data = await resp.json();
             if (data && data.prayerTime && data.prayerTime.length > 0) {
-              const p = data.prayerTime[0];
-              todayPrayerData = {
-                ...p,
-                dhuha: p.dhuha || addMinutesToTimeStr(p.syuruk, 25),
-                bearing: data.bearing || "292° 31′ 16″"
-              };
-              localStorage.setItem(`jakim_cache_${zoneCode}`, JSON.stringify(todayPrayerData));
-              badge.textContent = "JAKIM LIVE";
-              renderPrayerUI();
+              todayPrayerData = data.prayerTime[0];
+              localStorage.setItem(`jakim_cache_v2_${zoneCode}`, JSON.stringify(todayPrayerData));
+              syncEl.textContent = "Data rasmi e-Solat JAKIM (Langsung)";
+              renderPrayerTimes();
               return;
             }
           }
-        } catch (err) {
-          // Try next endpoint
-        }
+        } catch (_) {}
       }
 
-      // Fallback to localStorage cache if available
-      const saved = localStorage.getItem(`jakim_cache_${zoneCode}`);
-      if (saved) {
+      const cached = localStorage.getItem(`jakim_cache_v2_${zoneCode}`);
+      if (cached) {
         try {
-          todayPrayerData = JSON.parse(saved);
-          badge.textContent = "JAKIM CACHE";
-          renderPrayerUI();
+          todayPrayerData = JSON.parse(cached);
+          syncEl.textContent = "Data e-Solat JAKIM (Simpanan)";
+          renderPrayerTimes();
           return;
         } catch (_) {}
       }
 
-      if (badge.textContent === "MEMUAT...") {
-        badge.textContent = "JAKIM TAKWIM";
-      }
-      renderPrayerUI();
+      syncEl.textContent = "Takwim JAKIM Aktif";
+      renderPrayerTimes();
     }
 
-    // ============================================================================
-    // 6. FORMAT MASA, TARIKH HIJRI & RENDER WAKTU SOLAT
-    // ============================================================================
-    function formatPrayerTimeDisplay(timeStr) {
-      if (!timeStr) return "--:--";
-      const [hStr, mStr] = timeStr.split(":");
-      let h = parseInt(hStr, 10);
-      const m = mStr;
-      if (use24Hour) {
-        return `${String(h).padStart(2, "0")}:${m}`;
-      }
-      const suffix = h >= 12 ? "PTG" : "PG";
-      h = h % 12 || 12;
-      return `${h}:${m} ${suffix}`;
-    }
-
-    function formatHijriString(hijriRaw) {
-      if (!hijriRaw) return "1448H";
+    function formatHijri(hijriRaw) {
+      if (!hijriRaw) return "15 Jamadilawal 1448H";
       const parts = hijriRaw.split("-");
       if (parts.length !== 3) return hijriRaw;
       const year = parts[0];
       const monthIdx = parseInt(parts[1], 10) - 1;
       const day = parseInt(parts[2], 10);
-      const monthName = HIJRI_MONTHS_MS[monthIdx] || parts[1];
-      return `${day} ${monthName} ${year}H`;
+      return `${day} ${HIJRI_MONTHS_MS[monthIdx] || parts[1]} ${year}H`;
     }
 
-    function decodeHtmlEntities(str) {
-      const txt = document.createElement("textarea");
-      txt.innerHTML = str;
-      return txt.value;
+    function formatShortTime(timeStr) {
+      if (!timeStr) return "--:--";
+      const parts = timeStr.split(":");
+      return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
     }
 
-    function timeStrToSeconds(timeStr) {
+    function format12hTime(timeStr) {
+      if (!timeStr) return "--:--";
+      const [hStr, mStr] = timeStr.split(":");
+      let h = parseInt(hStr, 10);
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      return `${h}:${mStr} ${ampm}`;
+    }
+
+    function timeToSec(timeStr) {
       const parts = (timeStr || "00:00:00").split(":").map(Number);
       return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
     }
 
-    function renderPrayerUI() {
+    function renderPrayerTimes() {
       if (!todayPrayerData) return;
 
-      // Update Hijri & Qibla
-      document.getElementById("hijriDate").textContent = formatHijriString(todayPrayerData.hijri);
-      document.getElementById("qiblaText").textContent = decodeHtmlEntities(todayPrayerData.bearing || "292° 31′ 16″");
+      document.getElementById("hijriDateText").textContent = formatHijri(todayPrayerData.hijri);
 
       const now = new Date();
       const nowSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 
-      // Determine current and upcoming prayer
       let currentIdx = -1;
-      let upcomingIdx = 0;
-
-      const schedule = PRAYER_KEYS.map((item, idx) => {
-        const rawTime = todayPrayerData[item.key] || "00:00:00";
-        return {
-          ...item,
-          idx,
-          rawTime,
-          sec: timeStrToSeconds(rawTime)
-        };
+      const items = SIX_PRAYERS.map((p, idx) => {
+        const raw = todayPrayerData[p.key] || "00:00:00";
+        const el = document.getElementById(`time-${p.key}`);
+        if (el) el.textContent = formatShortTime(raw);
+        return { ...p, idx, raw, sec: timeToSec(raw) };
       });
 
-      for (let i = 0; i < schedule.length; i++) {
-        if (nowSec >= schedule[i].sec) {
-          currentIdx = i;
-        }
+      for (let i = 0; i < items.length; i++) {
+        if (nowSec >= items[i].sec) currentIdx = i;
       }
-      upcomingIdx = (currentIdx + 1) % schedule.length;
+      const nextIdx = (currentIdx + 1) % items.length;
+      const nextPrayer = items[nextIdx];
 
-      // Calculate countdown & progress
-      const upcoming = schedule[upcomingIdx];
-      let prevSec = currentIdx >= 0 ? schedule[currentIdx].sec : schedule[schedule.length - 1].sec - 86400;
-      let targetSec = upcoming.sec;
-      if (upcomingIdx === 0 && nowSec >= schedule[schedule.length - 1].sec) {
+      // Highlight tile waktu solat seterusnya
+      document.querySelectorAll(".prayer-tile").forEach((tile) => {
+        if (tile.getAttribute("data-key") === nextPrayer.key) {
+          tile.classList.add("active-next");
+        } else {
+          tile.classList.remove("active-next");
+        }
+      });
+
+      let targetSec = nextPrayer.sec;
+      if (nextIdx === 0 && nowSec >= items[items.length - 1].sec) {
         targetSec += 86400;
       }
-
       const diffSec = Math.max(0, targetSec - nowSec);
-      const hh = String(Math.floor(diffSec / 3600)).padStart(2, "0");
-      const mm = String(Math.floor((diffSec % 3600) / 60)).padStart(2, "0");
-      const ss = String(diffSec % 60).padStart(2, "0");
+      const hrs = Math.floor(diffSec / 3600);
+      const mins = Math.floor((diffSec % 3600) / 60);
 
-      const totalWindow = Math.max(1, targetSec - prevSec);
-      const elapsed = Math.min(totalWindow, Math.max(0, nowSec - prevSec));
-      const pct = Math.min(100, Math.max(4, (elapsed / totalWindow) * 100));
-
-      document.getElementById("nextPrayerName").textContent =
-        `${upcoming.label} • ${formatPrayerTimeDisplay(upcoming.rawTime)}`;
-      document.getElementById("nextPrayerCountdown").textContent = `-${hh}:${mm}:${ss}`;
-      document.getElementById("prayerProgressFill").style.width = `${pct.toFixed(1)}%`;
-
-      // Render 8 Prayer Cards in Dock
-      const dock = document.getElementById("prayerDock");
-      dock.innerHTML = schedule.map((item, idx) => {
-        let stateClass = "";
-        let statusText = "WAKTU SOLAT";
-        if (idx === currentIdx) {
-          stateClass = "current";
-          statusText = "SEKARANG";
-        } else if (idx === upcomingIdx) {
-          stateClass = "upcoming";
-          statusText = "SETERUSNYA";
-        } else if (idx < currentIdx) {
-          stateClass = "passed";
-          statusText = "LEPAS";
-        }
-
-        return `
-          <div class="prayer-card ${stateClass}">
-            <div class="prayer-status-pill">${statusText}</div>
-            <div class="prayer-icon">${item.icon}</div>
-            <div class="prayer-name">${item.label}</div>
-            <div class="prayer-time">${formatPrayerTimeDisplay(item.rawTime)}</div>
-          </div>
-        `;
-      }).join("");
+      const countdownStr = hrs > 0 ? `${hrs}j ${mins}m lagi` : `${mins} minit lagi`;
+      document.getElementById("nextPrayerSummary").textContent =
+        `Seterusnya: ${nextPrayer.label} (${format12hTime(nextPrayer.raw)}) · ${countdownStr}`;
     }
 
     // ============================================================================
-    // 7. JAM MASA NYATA (REAL-TIME CLOCK)
+    // 6. PAPARAN BERULANG 50 HADIS SAHIH MENARIK
     // ============================================================================
-    function tickClock() {
+    function renderHadith(index, animate = true) {
+      if (!HADITH_LIST.length) return;
+      currentHadithIdx = ((index % HADITH_LIST.length) + HADITH_LIST.length) % HADITH_LIST.length;
+      const item = HADITH_LIST[currentHadithIdx];
+      const wrap = document.getElementById("hadithBodyWrap");
+
+      const updateDOM = () => {
+        document.getElementById("hadithCollection").textContent = item.collection;
+        document.getElementById("hadithCounter").textContent =
+          `${String(currentHadithIdx + 1).padStart(2, "0")} / ${String(HADITH_LIST.length).padStart(2, "0")}`;
+        document.getElementById("hadithTitle").textContent = item.title;
+        document.getElementById("hadithText").textContent = item.text;
+        document.getElementById("hadithSource").textContent = `Ringkasan pengajaran · ${item.source}`;
+      };
+
+      if (animate) {
+        wrap.classList.add("fading");
+        setTimeout(() => {
+          updateDOM();
+          wrap.classList.remove("fading");
+        }, 280);
+      } else {
+        updateDOM();
+      }
+
+      hadithRemainingSec = HADITH_DURATION_SEC;
+      updateHadithTimerUI();
+    }
+
+    function updateHadithTimerUI() {
+      const mm = String(Math.floor(hadithRemainingSec / 60)).padStart(2, "0");
+      const ss = String(hadithRemainingSec % 60).padStart(2, "0");
+      document.getElementById("hadithTimerText").textContent = `${mm}:${ss}`;
+      const pct = (hadithRemainingSec / HADITH_DURATION_SEC) * 100;
+      document.getElementById("hadithProgressFill").style.width = `${ Math.max(0, Math.min(100, pct)) }%`;
+    }
+
+    // ============================================================================
+    // 7. JAM MASA NYATA & WALLPAPER MASJID
+    // ============================================================================
+    function tickEverySecond() {
       const now = new Date();
       let h = now.getHours();
       const m = String(now.getMinutes()).padStart(2, "0");
-      const s = String(now.getSeconds()).padStart(2, "0");
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
 
-      let ampm = h >= 12 ? "PTG" : "PG";
-      if (h >= 19 || h < 5) ampm = "MLM";
-      if (h >= 5 && h < 12) ampm = "PG";
-      if (h === 12) ampm = "TGH";
+      document.getElementById("clockHM").textContent = `${String(h).padStart(2, "0")}:${m}`;
+      document.getElementById("clockAmPm").textContent = ampm;
 
-      const displayH = use24Hour ? String(h).padStart(2, "0") : String(h % 12 || 12);
-      document.getElementById("clockHM").textContent = `${displayH}:${m}`;
-      document.getElementById("clockSec").textContent = s;
-      document.getElementById("clockAmPm").textContent = use24Hour ? "24J" : ampm;
+      const monthsEn = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+      document.getElementById("clockDateEn").textContent =
+        `${monthsEn[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 
-      // Format Gregorian Date in Bahasa Melayu
-      try {
-        const formattedDate = now.toLocaleDateString("ms-MY", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        });
-        document.getElementById("gregorianDate").textContent = formattedDate;
-      } catch (_) {}
+      renderPrayerTimes();
 
-      renderPrayerUI();
-    }
-
-    // ============================================================================
-    // 8. WALLPAPER SLIDESHOW MASJID MALAYSIA (DENGAN FALLBACK PINTAR)
-    // ============================================================================
-    function applyMosqueSlide(index) {
-      currentMosqueIndex = (index + MALAYSIA_MOSQUES.length) % MALAYSIA_MOSQUES.length;
-      const mosque = MALAYSIA_MOSQUES[currentMosqueIndex];
-
-      document.getElementById("mosqueName").textContent = mosque.name;
-      document.getElementById("mosqueLocation").textContent = mosque.location;
-
-      const nextSlideId = activeSlideId === "slideA" ? "slideB" : "slideA";
-      const nextEl = document.getElementById(nextSlideId);
-      const currEl = document.getElementById(activeSlideId);
-
-      // Test loading local wallpaper first, then remote, then gradient
-      const img = new Image();
-      img.onload = () => {
-        nextEl.style.backgroundImage = `url('${mosque.localUrl}')`;
-        nextEl.classList.add("active");
-        currEl.classList.remove("active");
-        activeSlideId = nextSlideId;
-      };
-      img.onerror = () => {
-        const remoteImg = new Image();
-        remoteImg.onload = () => {
-          nextEl.style.backgroundImage = `url('${mosque.remoteUrl}')`;
-          nextEl.classList.add("active");
-          currEl.classList.remove("active");
-          activeSlideId = nextSlideId;
-        };
-        remoteImg.onerror = () => {
-          nextEl.style.backgroundImage = mosque.fallbackGradient;
-          nextEl.classList.add("active");
-          currEl.classList.remove("active");
-          activeSlideId = nextSlideId;
-        };
-        remoteImg.src = mosque.remoteUrl;
-      };
-      img.src = mosque.localUrl;
-    }
-
-    // ============================================================================
-    // 9. KAWALAN INTERAKTIF, PARALLAX LIQUID GLASS & KELUAR SCREENSAVER
-    // ============================================================================
-    function updatePinUI() {
-      const btn = document.getElementById("pinModeBtn");
-      const hint = document.getElementById("hintText");
-      if (isPinnedInteractive) {
-        btn.textContent = "🔒 Mod Interaktif Aktif";
-        btn.classList.add("active-pin");
-        hint.textContent = "Mod Interaktif: Tukar zon JAKIM atau masjid di atas • Tekan [Esc] untuk keluar";
-        document.body.classList.remove("hide-cursor");
+      // Kiraan detik giliran 50 Hadis Sahih
+      hadithRemainingSec--;
+      if (hadithRemainingSec < 0) {
+        renderHadith(currentHadithIdx + 1, true);
       } else {
-        btn.textContent = "🌙 Mod Screensaver";
-        btn.classList.remove("active-pin");
-        hint.textContent = "Gerakkan tetikus untuk keluar • Tekan [Space] untuk Kunci Mod Interaktif";
+        updateHadithTimerUI();
       }
     }
 
-    function initInteractions() {
-      document.getElementById("prevWallBtn").addEventListener("click", () => {
-        applyMosqueSlide(currentMosqueIndex - 1);
-      });
-      document.getElementById("nextWallBtn").addEventListener("click", () => {
-        applyMosqueSlide(currentMosqueIndex + 1);
-      });
-      document.getElementById("formatBtn").addEventListener("click", (e) => {
-        use24Hour = !use24Hour;
-        localStorage.setItem("waktu_solat_24h", String(use24Hour));
-        e.currentTarget.textContent = use24Hour ? "24J" : "12J";
-        tickClock();
-      });
+    function applyMosqueWallpaper(idx) {
+      currentMosqueIdx = ((idx % MALAYSIA_MOSQUES.length) + MALAYSIA_MOSQUES.length) % MALAYSIA_MOSQUES.length;
+      const mosque = MALAYSIA_MOSQUES[currentMosqueIdx];
+      document.getElementById("footerMosqueName").textContent = mosque.name;
+
+      const nextId = activeSlideId === "slideA" ? "slideB" : "slideA";
+      const nextEl = document.getElementById(nextId);
+      const currEl = document.getElementById(activeSlideId);
+
+      const img = new Image();
+      img.onload = () => {
+        nextEl.style.backgroundImage = `url('${mosque.url}')`;
+        nextEl.classList.add("active");
+        currEl.classList.remove("active");
+        activeSlideId = nextId;
+      };
+      img.src = mosque.url;
+    }
+
+    // ============================================================================
+    // 8. KAWALAN INTERAKTIF & KELUAR SCREENSAVER
+    // ============================================================================
+    function updatePinButton() {
+      const btn = document.getElementById("pinModeBtn");
+      const hint = document.getElementById("footerHintText");
+      if (isPinnedInteractive) {
+        btn.textContent = "🔒 Mod Interaktif";
+        btn.classList.add("pinned");
+        hint.textContent = "Tekan [◀ / ▶] tukar Hadis · [Space] Mod Screensaver · [Esc] Keluar";
+        document.body.classList.remove("hide-cursor");
+      } else {
+        btn.textContent = "🌙 Mod Screensaver";
+        btn.classList.remove("pinned");
+        hint.textContent = "Gerakkan tetikus atau tekan kekunci untuk keluar";
+      }
+    }
+
+    function initEvents() {
+      document.getElementById("prevHadithBtn").addEventListener("click", () => renderHadith(currentHadithIdx - 1, true));
+      document.getElementById("nextHadithBtn").addEventListener("click", () => renderHadith(currentHadithIdx + 1, true));
+      document.getElementById("hadithCounter").addEventListener("click", () => renderHadith(currentHadithIdx + 1, true));
+      document.getElementById("nextMosqueBtn").addEventListener("click", () => applyMosqueWallpaper(currentMosqueIdx + 1));
       document.getElementById("pinModeBtn").addEventListener("click", () => {
         isPinnedInteractive = !isPinnedInteractive;
-        updatePinUI();
+        updatePinButton();
       });
 
-      // Subtle 3D tilt parallax on Hero Liquid Glass Card
-      const heroCard = document.getElementById("heroCard");
-      let lastMouseX = null;
-      let lastMouseY = null;
-      const launchTimestamp = Date.now();
+      let lastX = null;
+      let lastY = null;
+      const startTs = Date.now();
 
       window.addEventListener("mousemove", (e) => {
-        const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-        const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-        heroCard.style.transform = `perspective(1200px) rotateY(${(nx * 2.2).toFixed(2)}deg) rotateX(${(-ny * 2.2).toFixed(2)}deg)`;
-
-        // In pure screensaver mode (/s), exit if mouse moves significantly after 4s grace period
-        if (!isPinnedInteractive && isScreensaverExitArmed && Date.now() - launchTimestamp > 4000) {
-          if (lastMouseX !== null && lastMouseY !== null) {
-            const dist = Math.hypot(e.clientX - lastMouseX, e.clientY - lastMouseY);
-            if (dist > 35) {
+        if (!isPinnedInteractive && isScreensaverExitArmed && Date.now() - startTs > 4000) {
+          if (lastX !== null && lastY !== null) {
+            if (Math.hypot(e.clientX - lastX, e.clientY - lastY) > 38) {
               window.close();
             }
           }
-          lastMouseX = e.clientX;
-          lastMouseY = e.clientY;
+          lastX = e.clientX;
+          lastY = e.clientY;
         }
       });
 
       window.addEventListener("keydown", (e) => {
-        if (e.code === "Space") {
-          e.preventDefault();
-          isPinnedInteractive = !isPinnedInteractive;
-          updatePinUI();
-          return;
-        }
         if (e.code === "ArrowRight") {
-          applyMosqueSlide(currentMosqueIndex + 1);
+          renderHadith(currentHadithIdx + 1, true);
           return;
         }
         if (e.code === "ArrowLeft") {
-          applyMosqueSlide(currentMosqueIndex - 1);
+          renderHadith(currentHadithIdx - 1, true);
+          return;
+        }
+        if (e.code === "Space") {
+          e.preventDefault();
+          isPinnedInteractive = !isPinnedInteractive;
+          updatePinButton();
           return;
         }
         if (e.code === "Escape") {
           window.close();
           return;
         }
-        if (!isPinnedInteractive && isScreensaverExitArmed && Date.now() - launchTimestamp > 3000) {
+        if (!isPinnedInteractive && isScreensaverExitArmed && Date.now() - startTs > 3000) {
           window.close();
         }
       });
 
-      updatePinUI();
+      updatePinButton();
     }
 
     // ============================================================================
-    // 10. MULA APLIKASI
+    // 9. MULA
     // ============================================================================
     window.addEventListener("DOMContentLoaded", () => {
-      initZoneDropdown();
-      initInteractions();
-      applyMosqueSlide(0);
-      loadPrayerTimesForZone(currentZoneCode);
-      tickClock();
+      initZoneSelect();
+      initEvents();
+      applyMosqueWallpaper(0);
+      renderHadith(0, false);
+      loadPrayerTimes(currentZoneCode);
+      tickEverySecond();
 
-      setInterval(tickClock, 1000);
-      // Tukar wallpaper masjid setiap 25 saat
-      setInterval(() => applyMosqueSlide(currentMosqueIndex + 1), 25000);
-      // Kemas kini data JAKIM setiap 30 minit
-      setInterval(() => loadPrayerTimesForZone(currentZoneCode), 30 * 60 * 1000);
+      setInterval(tickEverySecond, 1000);
+      setInterval(() => applyMosqueWallpaper(currentMosqueIdx + 1), 30000);
+      setInterval(() => loadPrayerTimes(currentZoneCode), 30 * 60 * 1000);
     });
   </script>
 </body>

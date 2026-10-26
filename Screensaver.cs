@@ -5,10 +5,17 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+
+[assembly: AssemblyTitle("Waktu Solat Malaysia")]
+[assembly: AssemblyDescription("Waktu Solat Malaysia")]
+[assembly: AssemblyProduct("Waktu Solat Liquid Glass Screensaver")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
 
 namespace WaktuSolatScreensaver
 {
