@@ -312,7 +312,7 @@ namespace WaktuSolatScreensaver
 
             string profileDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "WaktuSolatLiquidGlass_EdgeProfile");
+                "WaktuSolatLiquidGlass_CleanProfile");
 
             if (File.Exists(edgePath))
             {
